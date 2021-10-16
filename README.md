@@ -1,6 +1,6 @@
-# Daxturus-s-Fractal-Generator
+# Daxturus's Fractal Generator
 A JavaScript tool that, when run, automatically generates a fractal using a custom fractal generator I built. I'm not sure if anyone has used this method of fractal generation yet; I may very well have created an entirely new kind of fractal set.
-At the moment, it's a bit buggy. It often shoots out "undefined" values. But, on the bright side, it works.
+At the moment, it's a bit buggy. It often shoots out "undefined" values. But, on the bright side, it works, and I'm finally free from this horrible curse of nonstop working on this project. I can go do my homework now.
 
 Controls:
 WASD: Move up and down.
