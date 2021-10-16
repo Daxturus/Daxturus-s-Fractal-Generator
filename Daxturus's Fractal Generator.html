@@ -36,7 +36,7 @@
 			Parser(window.prompt("Insert fractal info here:"))
 			extra = uuidv4()
 		}
-		if (e.key == "+" || e.key == "=")
+		if (e.key == "-" || e.key == "_")
 		{
 			Zoom = Zoom * Math.pow(2,0.25)
 			canvas.fillStyle = "#FFFFFF"
@@ -44,7 +44,7 @@
 			FastPixelGridPos = 0
 			Continue = true
 		}
-		if (e.key == "-" || e.key == "_")
+		if (e.key == "+" || e.key == "=")
 		{
 			Zoom = Zoom * Math.pow(1/2,0.25)
 			canvas.fillStyle = "#FFFFFF"
@@ -181,7 +181,7 @@
 	var OffY = 0
 	var PixelGrid = false
 	var FastPixelGrid = true
-	var FPGDownloadAfterFinish = true
+	var FPGDownloadAfterFinish = false //set to true if you want to render giant fractal images and not have to babysit it
 	var FastPixelGridPos = 0
 	var PiFraction = (1.9 + Math.random() * 1.1)
 	if (Math.random() > 0.5)
