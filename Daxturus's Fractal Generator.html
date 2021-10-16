@@ -1,0 +1,317 @@
+<canvas id="screen" width="256" height="256"></canvas>
+<meta charset="UTF-8"> 
+<script>
+	var screen = document.getElementById('screen');
+	var canvas = screen.getContext('2d');
+	
+	setInterval(Main, 1); 
+	
+	
+	//for loading old fractals back up
+	function Parser(input)
+	{
+		var InputStringArray = input.replace('ImgData&','').split(";");
+		var PointStringArray = InputStringArray[0].split("&")
+		var PointArray = []
+		var OldWidth = Number(InputStringArray[4])
+		var OldHeight = Number(InputStringArray[5])
+		for (var i = 0; i < PointStringArray.length; i++)
+		{
+			var SplitInfo = PointStringArray[i].split(",")
+			PointArray.push([ Number(SplitInfo[0]) / OldWidth * screen.width , Number(SplitInfo[1]) / OldHeight * screen.height , SplitInfo[2] ] )
+		}
+		POIs = JSON.parse(JSON.stringify(PointArray))
+		PiFraction = Number(InputStringArray[1])
+		JumpDist = Number(InputStringArray[2])
+		Direction = Number(InputStringArray[3])
+		canvas.fillStyle = "#FFFFFF"
+		canvas.fillRect(0,0,screen.width,screen.height)
+		FastPixelGridPos = 0
+		Continue = true
+	}
+	document.onkeypress = function(e)
+	{
+		if (e.key == "L" || e.key == "l")
+		{
+			Parser(window.prompt("Insert fractal info here:"))
+			extra = uuidv4()
+		}
+		if (e.key == "+" || e.key == "=")
+		{
+			Zoom = Zoom * Math.pow(2,0.25)
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "-" || e.key == "_")
+		{
+			Zoom = Zoom * Math.pow(1/2,0.25)
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "W" || e.key == "w")
+		{
+			OffY = OffY - screen.height / 4 * Zoom
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "S" || e.key == "s")
+		{
+			OffY = OffY + screen.height / 4 * Zoom
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "A" || e.key == "a")
+		{
+			OffX = OffX - screen.width / 4 * Zoom
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "D" || e.key == "d")
+		{
+			OffX = OffX + screen.width / 4 * Zoom
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "I" || e.key == "i")
+		{
+			screen.width = screen.width * 2
+			screen.height = screen.height * 2
+			for (var i = 0; i < POIs.length; i++)
+			{
+				POIs[i][0] = POIs[i][0] * 2
+				POIs[i][1] = POIs[i][1] * 2
+			}
+			OffX = OffX * 2
+			OffY = OffY * 2
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "K" || e.key == "k")
+		{
+			screen.width = screen.width / 2
+			screen.height = screen.height / 2
+			for (var i = 0; i < POIs.length; i++)
+			{
+				POIs[i][0] = POIs[i][0] / 2
+				POIs[i][1] = POIs[i][1] / 2
+			}
+			OffX = OffX / 2
+			OffY = OffY / 2
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "M" || e.key == "m")
+		{
+			itersMax = itersMax + 5
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "N" || e.key == "n")
+		{
+			itersMax = itersMax - 5
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "O" || e.key == "o")
+		{
+			var aDownloadLink2 = document.createElement('a');
+			var DownloadedData = "ImgData"
+			for (var p = 0; p < POIs.length; p++)
+			{
+				DownloadedData = DownloadedData + "&" + POIs[p][0] + "," + POIs[p][1] + "," + POIs[p][2]
+			}
+			DownloadedData = DownloadedData + ";" + PiFraction  + ";" + JumpDist + ";" + Direction + ";" + screen.width + ";" + screen.height
+			var txt = window.URL.createObjectURL(new Blob([DownloadedData], {type: 'text/plain'}));
+			aDownloadLink2.download = "ImgData"+extra+".txt"
+			aDownloadLink2.href = txt;
+			aDownloadLink2.click();
+		}
+		if (e.key == "P" || e.key == "p")
+		{
+			var image = screen.toDataURL();
+			var aDownloadLink = document.createElement('a');
+			aDownloadLink.download = "ImageRaw" + extra +"Pos"+OffX+";"+OffY+";"+Zoom+";"+screen.width+";"+screen.height+";"+itersMax+".png"
+			aDownloadLink.href = image;
+			aDownloadLink.click();
+		}
+		
+	}
+	
+	
+	//Daxturus's Rotational Fractal.
+	
+	//first generate a list of points.
+	var POIs = []
+	for (var i = 0; i < 5 + Math.random() * 25; i++)
+	{
+		POIs.push([Math.random()*screen.width/2+screen.width/4,Math.random()*screen.height/2+screen.height/4,"#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)])
+	}
+	
+	
+	//simply for naming files
+	function uuidv4() {
+		return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+		);
+	}
+	var extra = uuidv4()
+	//next, let's determine how we want our points to be moved.
+	var Zoom = 0.25
+	var OffX = 0
+	var OffY = 0
+	var PixelGrid = false
+	var FastPixelGrid = true
+	var FPGDownloadAfterFinish = true
+	var FastPixelGridPos = 0
+	var PiFraction = (1.9 + Math.random() * 1.1)
+	if (Math.random() > 0.5)
+	{
+		PiFraction = -PiFraction
+	}
+	var JumpDist = 0.1 + Math.random() * 0.8
+	var Direction = Math.random() > 0.5 ? 1 : -1
+	function IteratedFunction(x,y)
+	{
+		var closestPOIInd = -1
+		var closestPOIDist = 9999999999999
+		for (var i = 0; i < POIs.length; i++)
+		{
+			var DX = POIs[i][0] - x
+			var DY = POIs[i][1] - y
+			var Dist = Math.sqrt(DX * DX + DY * DY)
+			if (Dist < closestPOIDist)
+			{
+				closestPOIInd = i
+				closestPOIDist = Dist
+			}
+		}
+		if (!isNaN(closestPOIInd) && closestPOIInd >= 0)
+		{
+			var CX = POIs[closestPOIInd][0]
+			var CY = POIs[closestPOIInd][1]
+			var DX = CX - x
+			var DY = CY - y
+			var Dist = Math.sqrt(DX * DX + DY * DY)
+			//hmm lets try adding the angle from the center
+			var angleToMove = Math.atan2(DY, DX) + Math.atan2(y-screen.height/2,x-screen.width/2) * Direction + Math.PI / PiFraction
+			return [x + Dist * JumpDist * Math.cos(angleToMove), y + Dist * JumpDist * Math.sin(angleToMove)]
+		}
+		return false
+	}
+	//Parser("ImgData&1316.5311542151503,1340.6695818739565,#add4af&1079.4125436363324,653.2425302820996,#0628b6&854.0955846021028,1015.459366452855,#1e1720&550.6290719759523,1116.5991165624891,#c1e695&994.5835135251983,743.2312050017233,#8c1fdd&786.4427065676889,1477.4424719037959,#064a4e&957.1002611749982,1313.1268373744845,#b00f97&789.5730537150571,558.5101242444965,#39d4b5&555.7203549506507,1082.3590041019609,#5da6be&1445.2471118753476,1130.0985207404672,#991eec;2.330287244880879;0.11591865044459865;1;2048;2048")
+	//todo: gradient descent for maximum points generated per second
+	var maxPointsPerFrame = screen.width > 4096 ? 4096 : screen.width;
+	var itersMax = 100
+	var Continue = true
+	function Main() {
+		if (FastPixelGridPos > screen.width * screen.height && Continue)
+		{
+			Continue = false;
+			// Code credit to Kaundur
+			if (FPGDownloadAfterFinish == true)
+			{
+				var image = screen.toDataURL();
+				var aDownloadLink = document.createElement('a');
+				aDownloadLink.download = "ImageRaw" + extra + ".png"
+				aDownloadLink.href = image;
+				aDownloadLink.click();
+				var aDownloadLink2 = document.createElement('a');
+				var DownloadedData = "ImgData"
+				for (var p = 0; p < POIs.length; p++)
+				{
+					DownloadedData = DownloadedData + "&" + POIs[p][0] + "," + POIs[p][1] + "," + POIs[p][2]
+				}
+				DownloadedData = DownloadedData + ";" + PiFraction  + ";" + JumpDist + ";" + Direction + ";" + screen.width + ";" + screen.height
+				var txt = window.URL.createObjectURL(new Blob([DownloadedData], {type: 'text/plain'}));
+				aDownloadLink2.download = "ImgData"+extra+".txt"
+				aDownloadLink2.href = txt;
+				aDownloadLink2.click();
+				FPGDownloadAfterFinish = false
+			}
+		}
+		if (Continue == true)
+		{
+			//Color a few completely random points on the screen.
+			for (var i = 0; i < maxPointsPerFrame; i++)
+			{
+				var ScreenX = 0
+				var ScreenY = 0
+				if (FastPixelGrid == false)
+				{
+					ScreenX = Math.random() * screen.width
+					ScreenY = Math.random() * screen.height
+					if (PixelGrid == true)
+					{
+						ScreenX = Math.floor(ScreenX)
+						ScreenY = Math.floor(ScreenY)
+					}
+				}
+				if (FastPixelGrid == true)
+				{
+					ScreenX = FastPixelGridPos % screen.width
+					ScreenY = Math.floor(FastPixelGridPos / screen.width)
+					FastPixelGridPos++;
+				}
+				var OutX = (ScreenX - screen.width / 2) * Zoom + screen.width/2 + OffX
+				var OutY = (ScreenY - screen.height / 2) * Zoom + screen.height/2 + OffY
+				var Skip = false
+				for (var I = 0; I < itersMax; I++)
+				{
+					var Output = IteratedFunction(OutX,OutY)
+					if (isNaN(Output[0]) || isNaN(Output[1]))
+					{
+						Skip = true;
+						break;
+					}
+					OutX = Output[0]
+					OutY = Output[1]
+				}
+				if (Skip == false)
+				{
+					var closestPOIInd = -1
+					var closestPOIDist = 9999999999999
+					for (var j = 0; j < POIs.length; j++)
+					{
+						var DX = POIs[j][0] - OutX
+						var DY = POIs[j][1] - OutY
+						var Dist = Math.sqrt(DX * DX + DY * DY)
+						if (Dist < closestPOIDist)
+						{
+							closestPOIInd = j
+							closestPOIDist = Dist
+						}
+					}
+					canvas.fillStyle = POIs[closestPOIInd][2]
+					if (PixelGrid == true || FastPixelGrid == true)
+					{
+						canvas.fillRect(ScreenX, ScreenY, 1, 1)
+					}
+					if (PixelGrid == false && FastPixelGrid == false)
+					{
+						canvas.fillRect(ScreenX - 0.5, ScreenY - 0.5, 1, 1)
+					}
+				}
+			}
+		}
+	}
+</script>
