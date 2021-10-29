@@ -29,6 +29,28 @@
 		FastPixelGridPos = 0
 		Continue = true
 	}
+	function downloadImg()
+	{
+		var image = screen.toDataURL();
+		var aDownloadLink = document.createElement('a');
+		aDownloadLink.download = "ImageRaw" + extra +"Pos"+OffX+";"+OffY+";"+Zoom+";"+screen.width+";"+screen.height+";"+itersMax+(AngleMode==true?"_Angles":"")+".png"
+		aDownloadLink.href = image;
+		aDownloadLink.click();
+	}
+	function downloadData()
+	{
+		var aDownloadLink2 = document.createElement('a');
+		var DownloadedData = "ImgData"
+		for (var p = 0; p < POIs.length; p++)
+		{
+			DownloadedData = DownloadedData + "&" + POIs[p][0] + "," + POIs[p][1] + "," + POIs[p][2]
+		}
+		DownloadedData = DownloadedData + ";" + PiFraction  + ";" + JumpDist + ";" + Direction + ";" + screen.width + ";" + screen.height
+		var txt = window.URL.createObjectURL(new Blob([DownloadedData], {type: 'text/plain'}));
+		aDownloadLink2.download = "ImgData"+extra+".txt"
+		aDownloadLink2.href = txt;
+		aDownloadLink2.click();
+	}
 	document.onkeypress = function(e)
 	{
 		if (e.key == "L" || e.key == "l")
@@ -36,7 +58,7 @@
 			Parser(window.prompt("Insert fractal info here:"))
 			extra = uuidv4()
 		}
-		if (e.key == "-" || e.key == "_")
+		if (e.key == "+" || e.key == "=")
 		{
 			Zoom = Zoom * Math.pow(2,0.25)
 			canvas.fillStyle = "#FFFFFF"
@@ -44,7 +66,7 @@
 			FastPixelGridPos = 0
 			Continue = true
 		}
-		if (e.key == "+" || e.key == "=")
+		if (e.key == "-" || e.key == "_")
 		{
 			Zoom = Zoom * Math.pow(1/2,0.25)
 			canvas.fillStyle = "#FFFFFF"
@@ -116,17 +138,63 @@
 			FastPixelGridPos = 0
 			Continue = true
 		}
-		if (e.key == "M" || e.key == "m")
+		if (e.key == "R" || e.key == "r")
 		{
-			itersMax = itersMax + 5
+			AngleMode = !AngleMode
 			canvas.fillStyle = "#FFFFFF"
 			canvas.fillRect(0,0,screen.width,screen.height)
 			FastPixelGridPos = 0
 			Continue = true
 		}
-		if (e.key == "N" || e.key == "n")
+		if (e.key == "M")
+		{
+			if (itersMax <= 1)
+			{
+				itersMax = 5
+			}
+			else
+			{
+				itersMax = itersMax + 5
+			}
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "N")
 		{
 			itersMax = itersMax - 5
+			if (itersMax <= 1)
+			{
+				itersMax = 1
+			}
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "m")
+		{
+			if (itersMax <= 1)
+			{
+				itersMax = 2
+			}
+			else
+			{
+				itersMax = itersMax + 1
+			}
+			canvas.fillStyle = "#FFFFFF"
+			canvas.fillRect(0,0,screen.width,screen.height)
+			FastPixelGridPos = 0
+			Continue = true
+		}
+		if (e.key == "n")
+		{
+			itersMax = itersMax - 1
+			if (itersMax <= 1)
+			{
+				itersMax = 1
+			}
 			canvas.fillStyle = "#FFFFFF"
 			canvas.fillRect(0,0,screen.width,screen.height)
 			FastPixelGridPos = 0
@@ -134,25 +202,11 @@
 		}
 		if (e.key == "O" || e.key == "o")
 		{
-			var aDownloadLink2 = document.createElement('a');
-			var DownloadedData = "ImgData"
-			for (var p = 0; p < POIs.length; p++)
-			{
-				DownloadedData = DownloadedData + "&" + POIs[p][0] + "," + POIs[p][1] + "," + POIs[p][2]
-			}
-			DownloadedData = DownloadedData + ";" + PiFraction  + ";" + JumpDist + ";" + Direction + ";" + screen.width + ";" + screen.height
-			var txt = window.URL.createObjectURL(new Blob([DownloadedData], {type: 'text/plain'}));
-			aDownloadLink2.download = "ImgData"+extra+".txt"
-			aDownloadLink2.href = txt;
-			aDownloadLink2.click();
+			downloadData()
 		}
 		if (e.key == "P" || e.key == "p")
 		{
-			var image = screen.toDataURL();
-			var aDownloadLink = document.createElement('a');
-			aDownloadLink.download = "ImageRaw" + extra +"Pos"+OffX+";"+OffY+";"+Zoom+";"+screen.width+";"+screen.height+";"+itersMax+".png"
-			aDownloadLink.href = image;
-			aDownloadLink.click();
+			downloadImg()
 		}
 		
 	}
@@ -162,6 +216,7 @@
 	
 	//first generate a list of points.
 	var POIs = []
+	var AngleMode = false
 	for (var i = 0; i < 5 + Math.random() * 25; i++)
 	{
 		POIs.push([Math.random()*screen.width/2+screen.width/4,Math.random()*screen.height/2+screen.height/4,"#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)])
@@ -181,7 +236,7 @@
 	var OffY = 0
 	var PixelGrid = false
 	var FastPixelGrid = true
-	var FPGDownloadAfterFinish = false //set to true if you want to render giant fractal images and not have to babysit it
+	var FPGDownloadAfterFinish = true
 	var FastPixelGridPos = 0
 	var PiFraction = (1.9 + Math.random() * 1.1)
 	if (Math.random() > 0.5)
@@ -230,26 +285,12 @@
 			// Code credit to Kaundur
 			if (FPGDownloadAfterFinish == true)
 			{
-				var image = screen.toDataURL();
-				var aDownloadLink = document.createElement('a');
-				aDownloadLink.download = "ImageRaw" + extra + ".png"
-				aDownloadLink.href = image;
-				aDownloadLink.click();
-				var aDownloadLink2 = document.createElement('a');
-				var DownloadedData = "ImgData"
-				for (var p = 0; p < POIs.length; p++)
-				{
-					DownloadedData = DownloadedData + "&" + POIs[p][0] + "," + POIs[p][1] + "," + POIs[p][2]
-				}
-				DownloadedData = DownloadedData + ";" + PiFraction  + ";" + JumpDist + ";" + Direction + ";" + screen.width + ";" + screen.height
-				var txt = window.URL.createObjectURL(new Blob([DownloadedData], {type: 'text/plain'}));
-				aDownloadLink2.download = "ImgData"+extra+".txt"
-				aDownloadLink2.href = txt;
-				aDownloadLink2.click();
+				downloadData()
+				downloadImg()
 				FPGDownloadAfterFinish = false
 			}
 		}
-		if (Continue == true)
+		if (Continue == true && AngleMode == false)
 		{
 			//Color a few completely random points on the screen.
 			for (var i = 0; i < maxPointsPerFrame; i++)
@@ -302,6 +343,59 @@
 						}
 					}
 					canvas.fillStyle = POIs[closestPOIInd][2]
+					if (PixelGrid == true || FastPixelGrid == true)
+					{
+						canvas.fillRect(ScreenX, ScreenY, 1, 1)
+					}
+					if (PixelGrid == false && FastPixelGrid == false)
+					{
+						canvas.fillRect(ScreenX - 0.5, ScreenY - 0.5, 1, 1)
+					}
+				}
+			}
+		}
+		if (Continue == true && AngleMode == true)
+		{
+			for (var i = 0; i < maxPointsPerFrame; i++)
+			{
+				var ScreenX = 0
+				var ScreenY = 0
+				if (FastPixelGrid == false)
+				{
+					ScreenX = Math.random() * screen.width
+					ScreenY = Math.random() * screen.height
+					if (PixelGrid == true)
+					{
+						ScreenX = Math.floor(ScreenX)
+						ScreenY = Math.floor(ScreenY)
+					}
+				}
+				if (FastPixelGrid == true)
+				{
+					ScreenX = FastPixelGridPos % screen.width
+					ScreenY = Math.floor(FastPixelGridPos / screen.width)
+					FastPixelGridPos++;
+				}
+				var InpX = (ScreenX - screen.width / 2) * Zoom + screen.width/2 + OffX
+				var InpY = (ScreenY - screen.height / 2) * Zoom + screen.height/2 + OffY
+				var OutX = (ScreenX - screen.width / 2) * Zoom + screen.width/2 + OffX
+				var OutY = (ScreenY - screen.height / 2) * Zoom + screen.height/2 + OffY
+				var Skip = false
+				for (var I = 0; I < itersMax; I++)
+				{
+					var Output = IteratedFunction(OutX,OutY)
+					if (isNaN(Output[0]) || isNaN(Output[1]))
+					{
+						Skip = true;
+						break;
+					}
+					OutX = Output[0]
+					OutY = Output[1]
+				}
+				if (Skip == false)
+				{
+					var angleToPoint = Math.atan2(InpY - OutY, InpX - OutX)
+					canvas.fillStyle = "hsl("+Math.floor(angleToPoint/Math.PI*180)+", 50%, 50%)"
 					if (PixelGrid == true || FastPixelGrid == true)
 					{
 						canvas.fillRect(ScreenX, ScreenY, 1, 1)
