@@ -138,6 +138,50 @@
 			FastPixelGridPos = 0
 			Continue = true
 		}
+		if (e.key == "V" || e.key == "v")
+		{
+			if (AngleMode == true)
+			{
+				canvas.fillStyle = "#FFFFFF"
+				canvas.fillRect(0,0,screen.width,screen.height)
+				FastPixelGridPos = 0
+				Continue = true
+			}
+			changeAngle = changeAngle + Math.PI / 2
+		}
+		if (e.key == "X" || e.key == "x")
+		{
+			if (AngleMode == true)
+			{
+				canvas.fillStyle = "#FFFFFF"
+				canvas.fillRect(0,0,screen.width,screen.height)
+				FastPixelGridPos = 0
+				Continue = true
+			}
+			AngleSide = !AngleSide
+		}
+		if (e.key == "Z" || e.key == "z")
+		{
+			if (AngleMode == true)
+			{
+				canvas.fillStyle = "#FFFFFF"
+				canvas.fillRect(0,0,screen.width,screen.height)
+				FastPixelGridPos = 0
+				Continue = true
+			}
+			AngleFromDist = !AngleFromDist
+		}
+		if (e.key == "C" || e.key == "c")
+		{
+			if (AngleMode == true)
+			{
+				canvas.fillStyle = "#FFFFFF"
+				canvas.fillRect(0,0,screen.width,screen.height)
+				FastPixelGridPos = 0
+				Continue = true
+			}
+			changeAngle = changeAngle - Math.PI / 2
+		}
 		if (e.key == "R" || e.key == "r")
 		{
 			AngleMode = !AngleMode
@@ -217,11 +261,13 @@
 	//first generate a list of points.
 	var POIs = []
 	var AngleMode = false
+	var changeAngle = Math.PI/2
+	var AngleSide = false
+	var AngleFromDist = false
 	for (var i = 0; i < 5 + Math.random() * 25; i++)
 	{
 		POIs.push([Math.random()*screen.width/2+screen.width/4,Math.random()*screen.height/2+screen.height/4,"#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)])
 	}
-	
 	
 	//simply for naming files
 	function uuidv4() {
@@ -394,7 +440,33 @@
 				}
 				if (Skip == false)
 				{
-					var angleToPoint = Math.atan2(InpY - OutY, InpX - OutX)
+					var angleToPoint;
+					if (AngleFromDist == false)
+					{
+						if (AngleSide == true)
+						{
+							angleToPoint = (Math.atan2(OutX - InpX, OutY - InpY) + changeAngle) % (Math.PI * 2)
+						}
+						else
+						{
+							angleToPoint = (Math.atan2(InpY - OutY, InpX - OutX) + changeAngle) % (Math.PI * 2)
+						}
+					}
+					else
+					{
+						var DiX = InpX - OutX
+						var DiY = InpY - OutY
+						var DistToFinalPoint = Math.sqrt(DiX * DiX + DiY * DiY)
+						var DiagScreenLen = Math.sqrt(screen.width * screen.width + screen.height * screen.height)
+						if (AngleSide == true)
+						{
+							angleToPoint = (Math.cos(DistToFinalPoint / Zoom * Math.PI * 4 / DiagScreenLen) + changeAngle) % (Math.PI * 2)
+						}
+						else
+						{
+							angleToPoint = (Math.sin(DistToFinalPoint / Zoom * Math.PI * 4 / DiagScreenLen) + changeAngle) % (Math.PI * 2)
+						}
+					}
 					canvas.fillStyle = "hsl("+Math.floor(angleToPoint/Math.PI*180)+", 50%, 50%)"
 					if (PixelGrid == true || FastPixelGrid == true)
 					{
