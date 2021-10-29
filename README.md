@@ -13,3 +13,7 @@ I/K: Increase or decrease the canvas size accordingly.
 O: Download fractal data.
 P: Capture image of canvas.
 L: Load generated fractal data.
+R: Switch between Colored and Angle-Colored view.
+Z: In Angle View, switch between coloring points based on distance from start and coloring points based on angle from start.
+C/V: In Angle View, hold down or rapidly click to adjust coloring.
+X: Currently not intended to be a control; but is still useable. Will change coloring slightly.
