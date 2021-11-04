@@ -388,16 +388,19 @@
 							closestPOIDist = Dist
 						}
 					}
-					if (typeof POIs[closestPOIInd][2] !== 'undefined')
+					if (typeof POIs[closestPOIInd ]!== 'undefined')
 					{
-						canvas.fillStyle = POIs[closestPOIInd][2]
-						if (PixelGrid == true || FastPixelGrid == true)
+						if (typeof POIs[closestPOIInd][2] !== 'undefined')
 						{
-							canvas.fillRect(ScreenX, ScreenY, 1, 1)
-						}
-						if (PixelGrid == false && FastPixelGrid == false)
-						{
-							canvas.fillRect(ScreenX - 0.5, ScreenY - 0.5, 1, 1)
+							canvas.fillStyle = POIs[closestPOIInd][2]
+							if (PixelGrid == true || FastPixelGrid == true)
+							{
+								canvas.fillRect(ScreenX, ScreenY, 1, 1)
+							}
+							if (PixelGrid == false && FastPixelGrid == false)
+							{
+								canvas.fillRect(ScreenX - 0.5, ScreenY - 0.5, 1, 1)
+							}
 						}
 					}
 				}
